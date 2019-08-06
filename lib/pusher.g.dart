@@ -33,11 +33,20 @@ Map<String, dynamic> _$BindArgsToJson(BindArgs instance) => <String, dynamic>{
     };
 
 PusherOptions _$PusherOptionsFromJson(Map<String, dynamic> json) {
-  return PusherOptions(cluster: json['cluster'] as String);
+  return PusherOptions(
+      cluster: json['cluster'] as String,
+      host: json['host'] as String,
+      wsPort: json['wsPort'] as int,
+      wssPort: json['wssPort'] as int);
 }
 
 Map<String, dynamic> _$PusherOptionsToJson(PusherOptions instance) =>
-    <String, dynamic>{'cluster': instance.cluster};
+    <String, dynamic>{
+      'cluster': instance.cluster,
+      'host': instance.host,
+      'wsPort': instance.wsPort,
+      'wssPort': instance.wssPort
+    };
 
 ConnectionStateChange _$ConnectionStateChangeFromJson(
     Map<String, dynamic> json) {

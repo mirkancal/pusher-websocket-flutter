@@ -105,6 +105,15 @@ public class PusherPlugin implements MethodCallHandler {
       if (options.has("cluster")) {
         pusherOptions.setCluster(options.getString("cluster"));
       }
+      if(options.has("host")) {
+        pusherOptions.setHost(options.getString("host"));
+      }
+      if(options.has("wsPort")) {
+        pusherOptions.setWsPort(options.getInt("wsPort"));
+      }
+      if(options.has("wssPort")) {
+        pusherOptions.setWssPort(options.getInt("wssPort"));
+      }
 
       // create client
       pusher = new Pusher(json.getString("appKey"), pusherOptions);

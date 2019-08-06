@@ -128,8 +128,11 @@ class BindArgs {
 @JsonSerializable()
 class PusherOptions {
   String cluster;
+  String host;
+  int wsPort;
+  int wssPort;
 
-  PusherOptions({this.cluster});
+  PusherOptions({this.cluster, this.host, this.wsPort, this.wssPort});
 
   factory PusherOptions.fromJson(Map<String, dynamic> json) =>
       _$PusherOptionsFromJson(json);
