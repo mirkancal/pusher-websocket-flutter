@@ -57,30 +57,30 @@ public class PusherPlugin implements MethodCallHandler {
   @Override
   public void onMethodCall(MethodCall call, Result result) {
     switch (call.method) {
-      case "init":
-        init(call, result);
-        break;
-      case "connect":
-        connect(call, result);
-        break;
-      case "disconnect":
-        disconnect(call, result);
-        break;
-      case "subscribe":
-        subscribe(call, result);
-        break;
-      case "unsubscribe":
-        unsubscribe(call, result);
-        break;
-      case "bind":
-        bind(call, result);
-        break;
-      case "unbind":
-        unbind(call, result);
-        break;
-      default:
-        result.notImplemented();
-        break;
+    case "init":
+      init(call, result);
+      break;
+    case "connect":
+      connect(call, result);
+      break;
+    case "disconnect":
+      disconnect(call, result);
+      break;
+    case "subscribe":
+      subscribe(call, result);
+      break;
+    case "unsubscribe":
+      unsubscribe(call, result);
+      break;
+    case "bind":
+      bind(call, result);
+      break;
+    case "unbind":
+      unbind(call, result);
+      break;
+    default:
+      result.notImplemented();
+      break;
     }
   }
 
@@ -94,7 +94,7 @@ public class PusherPlugin implements MethodCallHandler {
 
     try {
       JSONObject json = new JSONObject(call.arguments.toString());
-      JSONObject options  = json.getJSONObject("options");
+      JSONObject options = json.getJSONObject("options");
 
       if (json.has("isLoggingEnabled")) {
         isLoggingEnabled = json.getBoolean("isLoggingEnabled");
@@ -105,16 +105,16 @@ public class PusherPlugin implements MethodCallHandler {
       if (options.has("cluster")) {
         pusherOptions.setCluster(options.getString("cluster"));
       }
-      if(options.has("host")) {
+      if (options.has("host")) {
         pusherOptions.setHost(options.getString("host"));
       }
-      if(options.has("wsPort")) {
+      if (options.has("wsPort")) {
         pusherOptions.setWsPort(options.getInt("wsPort"));
       }
-      if(options.has("wssPort")) {
+      if (options.has("wssPort")) {
         pusherOptions.setWssPort(options.getInt("wssPort"));
       }
-
+      pusherOptions.setEncrypted(true);
       // create client
       pusher = new Pusher(json.getString("appKey"), pusherOptions);
 
@@ -134,51 +134,51 @@ public class PusherPlugin implements MethodCallHandler {
     pusher.connect(new ConnectionEventListener() {
       @Override
       public void onConnectionStateChange(final ConnectionStateChange change) {
-          new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-              try {
-                JSONObject eventStreamMessageJson = new JSONObject();
-                JSONObject connectionStateChangeJson = new JSONObject();
-                connectionStateChangeJson.put("currentState", change.getCurrentState().toString());
-                connectionStateChangeJson.put("previousState", change.getPreviousState().toString());
-                eventStreamMessageJson.put("connectionStateChange", connectionStateChangeJson);
-                eventSinks.success(eventStreamMessageJson.toString());
-              } catch (Exception e) {
-                if (isLoggingEnabled) {
-                  Log.d(TAG, "onConnectionStateChange error: " + e.getMessage());
-                  e.printStackTrace();
-                }
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              JSONObject eventStreamMessageJson = new JSONObject();
+              JSONObject connectionStateChangeJson = new JSONObject();
+              connectionStateChangeJson.put("currentState", change.getCurrentState().toString());
+              connectionStateChangeJson.put("previousState", change.getPreviousState().toString());
+              eventStreamMessageJson.put("connectionStateChange", connectionStateChangeJson);
+              eventSinks.success(eventStreamMessageJson.toString());
+            } catch (Exception e) {
+              if (isLoggingEnabled) {
+                Log.d(TAG, "onConnectionStateChange error: " + e.getMessage());
+                e.printStackTrace();
               }
             }
-          });
+          }
+        });
       }
 
       @Override
       public void onError(final String message, final String code, final Exception ex) {
-          new Handler(Looper.getMainLooper()).post(new Runnable() {
-              @Override
-              public void run() {
-                  try {
-                      String exMessage = null;
-                      if (ex != null)
-                          exMessage = ex.getMessage();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              String exMessage = null;
+              if (ex != null)
+                exMessage = ex.getMessage();
 
-                      JSONObject eventStreamMessageJson = new JSONObject();
-                      JSONObject connectionErrorJson = new JSONObject();
-                      connectionErrorJson.put("message", message);
-                      connectionErrorJson.put("code", code);
-                      connectionErrorJson.put("exception", exMessage);
-                      eventStreamMessageJson.put("connectionError", connectionErrorJson);
-                      eventSinks.success(eventStreamMessageJson.toString());
-                  } catch (Exception e) {
-                      if (isLoggingEnabled) {
-                          Log.d(TAG, "onError error: " + e.getMessage());
-                          e.printStackTrace();
-                      }
-                  }
+              JSONObject eventStreamMessageJson = new JSONObject();
+              JSONObject connectionErrorJson = new JSONObject();
+              connectionErrorJson.put("message", message);
+              connectionErrorJson.put("code", code);
+              connectionErrorJson.put("exception", exMessage);
+              eventStreamMessageJson.put("connectionError", connectionErrorJson);
+              eventSinks.success(eventStreamMessageJson.toString());
+            } catch (Exception e) {
+              if (isLoggingEnabled) {
+                Log.d(TAG, "onError error: " + e.getMessage());
+                e.printStackTrace();
               }
-          });
+            }
+          }
+        });
       }
     }, ConnectionState.ALL);
 
@@ -275,7 +275,8 @@ class EventListener implements SubscriptionEventListener {
           String eventStreamMessageJsonString = eventStreamMessageJson.toString();
           PusherPlugin.eventSinks.success(eventStreamMessageJsonString);
           if (PusherPlugin.isLoggingEnabled) {
-            Log.d(PusherPlugin.TAG, "Pusher event: CH:" + channelName + " EN:" + eventName + " ED:" + eventStreamMessageJsonString);
+            Log.d(PusherPlugin.TAG,
+                "Pusher event: CH:" + channelName + " EN:" + eventName + " ED:" + eventStreamMessageJsonString);
           }
         } catch (Exception e) {
           if (PusherPlugin.isLoggingEnabled) {
@@ -287,5 +288,3 @@ class EventListener implements SubscriptionEventListener {
     });
   }
 }
-
-
